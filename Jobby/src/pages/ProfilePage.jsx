@@ -59,7 +59,7 @@ const ProfilePage = () => {
                 {/* Profile Page Content */}
                 <div className="w-3/4 h-full flex flex-col items-center overflow-y-auto py-10 space-y-6 px-8">
                     <div className="bg-white w-11/12 p-8 border border-gray-300 rounded-lg shadow-lg">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-6">Profile</h2>
+                        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Profile</h2>
 
                         <div className="flex items-center justify-center">
                             {isEditing ? (
@@ -68,7 +68,7 @@ const ProfilePage = () => {
                                     name="profilePicture"
                                     accept="image/*"
                                     onChange={handleProfilePictureChange}
-                                    className="mb-6"
+                                    className="mb-6 border-1 h-[20vh] w-[20vh] rounded-[10vh]"
                                 />
                             ) : (
                                 <div>
@@ -87,7 +87,7 @@ const ProfilePage = () => {
                                     )}
                                 </div>
                             )}
-                        </div>
+                        </div> <br /><br /> 
 
                         <div className="space-y-4">
                             <div>

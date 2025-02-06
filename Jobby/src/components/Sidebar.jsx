@@ -35,9 +35,9 @@ const Sidebar = () => {
     };
 
     return (
-        <div className="w-1/4 h-full bg-gray-200 p-5 border-r border-gray-300">
+        <div className="w-1/4 h-full p-5 border-r border-gray-300">
             {/* Search Bar */}
-            <div className="flex items-center bg-white border border-gray-400 px-4 py-2 w-full mb-6 rounded-lg">
+            <div className="flex items-center bg-white border border-gray-400 px-4 py-2 w-full mb-6">
                 <FaSearch className="text-gray-500 text-lg" />
                 <input
                     type="text"
@@ -51,7 +51,7 @@ const Sidebar = () => {
                 {/* Admin Section */}
                 <li>
                     <div
-                        className="flex items-center justify-between bg-white p-4 rounded-lg shadow-md cursor-pointer hover:bg-gray-100"
+                        className="flex items-center justify-between p-4 rounded-lg shadow-md cursor-pointer hover:bg-gray-100"
                         onClick={() => toggleSection("admin")}
                     >
                         <div className="flex items-center space-x-3">
@@ -83,7 +83,7 @@ const Sidebar = () => {
                 {/* Employer Section */}
                 <li>
                     <div
-                        className="flex items-center justify-between bg-white p-4 rounded-lg shadow-md cursor-pointer hover:bg-gray-100"
+                        className="flex items-center justify-between p-4 rounded-lg shadow-md cursor-pointer hover:bg-gray-100"
                         onClick={() => toggleSection("employer")}
                     >
                         <div className="flex items-center space-x-3">
@@ -115,7 +115,7 @@ const Sidebar = () => {
                 <li>
                     <Link
                         to="/jobs"
-                        className={`flex items-center bg-white p-4 rounded-lg shadow-md hover:bg-gray-100 ${location.pathname === "/jobs" ? "bg-blue-500 text-white font-bold" : "text-gray-700 hover:text-blue-600"
+                        className={`flex items-center p-4 rounded-lg shadow-md ${location.pathname === "/jobs" ? "bg-blue-500 text-white font-bold" : "text-gray-700 hover:text-blue-600"
                             }`}
                     >
                         <FaBriefcase className={`text-xl mr-3 ${location.pathname === "/jobs" ? "text-white" : "text-gray-600"}`} />
@@ -127,7 +127,7 @@ const Sidebar = () => {
                 <li>
                     <Link
                         to="/profile"
-                        className={`flex items-center bg-white p-4 rounded-lg shadow-md hover:bg-gray-100 ${location.pathname === "/profile" ? "bg-blue-500 text-white font-bold" : "text-gray-700 hover:text-blue-600"
+                        className={`flex items-center p-4 rounded-lg shadow-md ${location.pathname === "/profile" ? "bg-blue-500 text-white font-bold" : "text-gray-700 hover:text-blue-600"
                             }`}
                     >
                         <FaUser className={`text-xl mr-3 ${location.pathname === "/profile" ? "text-white" : "text-gray-600"}`} />
@@ -139,7 +139,7 @@ const Sidebar = () => {
                 <li>
                     <Link
                         to="/employee-dashboard"
-                        className={`flex items-center bg-white p-4 rounded-lg shadow-md hover:bg-gray-100 ${location.pathname === "/employee-dashboard" ? "bg-blue-500 text-white font-bold" : "text-gray-700 hover:text-blue-600"
+                        className={`flex items-center p-4 rounded-lg shadow-md ${location.pathname === "/employee-dashboard" ? "bg-blue-500 text-white font-bold" : "text-gray-700 hover:text-blue-600"
                             }`}
                     >
                         <FaFileAlt className={`text-xl mr-3 ${location.pathname === "/employee-dashboard" ? "text-white" : "text-gray-600"}`} />
@@ -150,7 +150,7 @@ const Sidebar = () => {
                 <li>
                     <Link
                         to="/logout"
-                        className="flex items-center bg-white p-4 rounded-lg shadow-md text-red-600 hover:bg-gray-100"
+                        className="flex items-center p-4 rounded-lg shadow-md text-red-600"
                     >
                         <FaSignOutAlt className="text-xl mr-3" />
                         Logout
