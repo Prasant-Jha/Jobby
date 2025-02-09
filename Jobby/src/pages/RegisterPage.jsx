@@ -46,7 +46,7 @@ function RegisterPage() {
         <div className="bg-white rounded-lg max-w-2xl w-full p-8 shadow-md">
           <h1 className="text-2xl font-bold mb-2">Create your profile</h1>
           <p className="text-gray-600 text-sm mb-4">Search & apply to jobs from India's No.1 Job Site</p>
-          <form className="space-y-4">
+          <form action="/login" className="space-y-4">
             <div>
               <label className="font-semibold">Full name*</label>
               <input type="text" placeholder="What is your name?" className="w-full p-2 border rounded mt-1" />
