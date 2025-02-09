@@ -149,7 +149,7 @@ const Sidebar = () => {
 
                 <li>
                     <Link
-                        to="/logout"
+                        to="/Login"
                         className="flex items-center p-4 rounded-lg shadow-md text-red-600"
                     >
                         <FaSignOutAlt className="text-xl mr-3" />
