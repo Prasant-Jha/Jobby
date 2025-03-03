@@ -1,87 +1,118 @@
-import React, { useState } from "react";
-import { FaSearch, FaUser, FaHome, FaBriefcase, FaTachometerAlt, FaSignOutAlt, FaChevronRight, FaDownload } from "react-icons/fa";
+import React, { useEffect, useState } from "react";
+import { FaTrash, FaEdit } from "react-icons/fa";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
+import { useNavigate } from "react-router-dom";
 
 const EmployerDashboard = () => {
-  // State to store applications
-  const [applications, setApplications] = useState([
-    { id: "1", userId: "user123", resumeName: "resume.pdf", resumeUrl: "/path/to/resume.pdf", status: "Pending" },
-    { id: "2", userId: "user456", resumeName: "cv.docx", resumeUrl: "/path/to/cv.docx", status: "Pending" },
-  ]);
+  const navigate = useNavigate();
+  const [jobPosts, setJobPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Function to update application status
-  const onUpdateStatus = (appId, newStatus) => {
-    setApplications((prevApps) =>
-      prevApps.map((app) =>
-        app.id === appId ? { ...app, status: newStatus } : app
-      )
-    );
+  // Get the employer's email from localStorage
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  const employerEmail = storedUser.email;
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/jobs/");
+        const data = await response.json();
+        if (response.ok) {
+          // Filter jobs where employer_email matches the logged-in employer's email
+          const filteredJobs = data.filter(job => job.employer_email === employerEmail);
+          setJobPosts(filteredJobs);
+        } else {
+          throw new Error(data.message || "Failed to fetch job posts.");
+        }
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJobs();
+  }, [employerEmail]); // Dependency added to refetch if email changes
+
+  const onDeleteJobPost = async (jobId) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/jobs/${jobId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        setJobPosts(jobPosts.filter(job => job.id !== jobId));
+      } else {
+        throw new Error("Failed to delete job post.");
+      }
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const onUpdateJobPost = (jobId) => {
+    navigate(`/update-job/${jobId}`);
   };
 
   return (
     <div className="w-full min-h-screen bg-gray-100">
-      {/* Header Section */}
       <Header />
 
-      {/* Main Content */}
       <div className="flex w-full h-[calc(100vh-80px)]">
-        {/* Sidebar */}
         <Sidebar />
-        
-        {/* Applications Section */}
-        <div className="w-3/4 h-full flex flex-col items-center overflow-y-auto py-10 space-y-6 px-8">
-          <h2 className="text-2xl font-bold text-gray-800">Manage Job Applications</h2>
-          {applications.length === 0 ? (
-            <p className="text-gray-600">No applications yet.</p>
-          ) : (
-            applications.map((app) => (
-              <div
-                key={app.id}
-                className="bg-white w-11/12 p-6 border border-gray-300 rounded-lg shadow-md"
-              >
-                <p className="text-gray-700">
-                  <strong>Candidate:</strong> {app.userId}
-                </p>
-                <p className="text-gray-700">
-                  <strong>Resume:</strong> {app.resumeName}
-                </p>
-                <p className="text-gray-700">
-                  <strong>Status:</strong>{" "}
-                  <span className="text-blue-600">{app.status}</span>
-                </p>
-                <div className="flex space-x-4 mt-4">
-                  <button
-                    onClick={() => onUpdateStatus(app.id, "Selected")}
-                    className="bg-green-500 text-white px-4 py-2 rounded-md"
-                  >
-                    Select
-                  </button>
-                  <button
-                    onClick={() => onUpdateStatus(app.id, "Pending")}
-                    className="bg-yellow-500 text-white px-4 py-2 rounded-md"
-                  >
-                    Pending
-                  </button>
-                  <button
-                    onClick={() => onUpdateStatus(app.id, "Rejected")}
-                    className="bg-red-500 text-white px-4 py-2 rounded-md"
-                  >
-                    Reject
-                  </button>
-                  {/* Download Resume Button */}
-                  <a
-                    href={app.resumeUrl} // path to the resume file
-                    download={app.resumeName} // the name it should be downloaded as
-                    className="bg-blue-500 text-white px-4 py-2 rounded-md flex items-center space-x-2"
-                  >
-                    <FaDownload className="text-white" />
-                    <span>Download Resume</span>
-                  </a>
-                </div>
-              </div>
-            ))
-          )}
+
+        <div className="w-3/4 h-full flex flex-col items-center overflow-y-auto py-10 space-y-6 px-8 scrollbar-hide">
+          <h2 className="text-3xl font-bold text-gray-800">Employer Dashboard</h2>
+          <div className="w-full bg-white p-6 rounded-xl shadow-lg">
+            {loading && <p>Loading job posts...</p>}
+            {error && <p className="text-red-500">{error}</p>}
+            {!loading && jobPosts.length === 0 && <p className="text-center text-gray-600">No job posts found.</p>}
+            {!loading && jobPosts.length > 0 && (
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="bg-gray-200">
+                    <th className="p-3 text-left">Image</th>
+                    <th className="p-3 text-left">Job Title</th>
+                    <th className="p-3 text-left">Company</th>
+                    <th className="p-3 text-left">Location</th>
+                    <th className="p-3 text-left">Salary</th>
+                    <th className="p-3 text-left">Job Type</th>
+                    <th className="p-3 text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {jobPosts.map((job) => (
+                    <tr key={job.id} className="border-b">
+                      <td className="p-3">
+                        <img
+                          src={job.image && job.image.trim() ? `http://localhost:5000/uploads/${job.image}` : "/images/default-job.png"}
+                          alt="Job"
+                          className="w-10 h-10 rounded-full object-cover"
+                          onError={(e) => { e.target.src = "/images/default-job.png"; }}
+                        />
+                      </td>
+
+                      <td className="p-3">{job.job_title}</td>
+                      <td className="p-3">{job.company}</td>
+                      <td className="p-3">{job.location}</td>
+                      <td className="p-3">{job.salary}</td>
+                      <td className="p-3">{job.job_type}</td>
+                      <td className="p-3 text-center flex justify-center gap-4">
+                        <button onClick={() => onUpdateJobPost(job.id)} className="text-blue-600 hover:text-blue-800">
+                          <FaEdit className="text-xl" />
+                        </button>
+                        <button onClick={() => onDeleteJobPost(job.id)} className="text-red-600 hover:text-red-800">
+                          <FaTrash className="text-xl" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
         </div>
       </div>
     </div>

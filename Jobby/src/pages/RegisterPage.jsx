@@ -1,10 +1,53 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaCheckCircle } from "react-icons/fa";
 import Micky from "../assets/micky.png";
-import Google from "../assets/google.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function RegisterPage() {
+  const [formData, setFormData] = useState({
+    full_name: "",
+    email: "",
+    password: "",
+    mobile: "",
+    role: "",
+  });
+  
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData({
+      ...formData,
+      [name]: type === "checkbox" ? checked : value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    console.log("Form Data being sent:", formData); // ✅ Check if `role` is set
+
+    if (!formData.role) {
+        return setError("Please select a role.");
+    }
+
+    try {
+        const response = await axios.post("http://localhost:5000/api/users/register", formData);
+        if (response.status === 201) {
+            navigate("/login");
+        }
+    } catch (err) {
+        console.error("Error Response:", err.response?.data); // ✅ Log error details
+        setError(err.response?.data?.message || "Something went wrong. Please try again.");
+    }
+};
+
+
+
+
   return (
     <>
       {/* Header Section */}
@@ -39,70 +82,52 @@ function RegisterPage() {
               <span>Find a job and grow your career</span>
             </li>
           </ul>
-
         </div>
 
         {/* Registration Form */}
         <div className="bg-white rounded-lg max-w-2xl w-full p-8 shadow-md">
           <h1 className="text-2xl font-bold mb-2">Create your profile</h1>
           <p className="text-gray-600 text-sm mb-4">Search & apply to jobs from India's No.1 Job Site</p>
-          <form action="/login" className="space-y-4">
+          {error && <p className="text-red-600">{error}</p>}
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="font-semibold">Full name*</label>
-              <input type="text" placeholder="What is your name?" className="w-full p-2 border rounded mt-1" />
+              <input type="text" name="full_name" value={formData.full_name} onChange={handleChange} placeholder="What is your name?" className="w-full p-2 border rounded mt-1" required />
             </div>
 
             <div>
               <label className="font-semibold">Email ID*</label>
-              <input type="email" placeholder="Tell us your Email ID" className="w-full p-2 border rounded mt-1" />
-              <small className="text-gray-500">We'll send relevant jobs and updates to this email</small>
+              <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Tell us your Email ID" className="w-full p-2 border rounded mt-1" required />
             </div>
 
             <div>
               <label className="font-semibold">Password*</label>
-              <input type="password" placeholder="(Minimum 6 characters)" className="w-full p-2 border rounded mt-1" />
-              <small className="text-gray-500">This helps your account stay protected</small>
+              <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="(Minimum 6 characters)" className="w-full p-2 border rounded mt-1" required />
             </div>
 
             <div>
               <label className="font-semibold">Mobile number*</label>
               <div className="flex items-center border rounded overflow-hidden">
                 <span className="bg-gray-200 px-4 py-2">+91</span>
-                <input type="text" placeholder="Enter your mobile number" className="w-full p-2 border-l" />
+                <input type="text" name="mobile" value={formData.mobile} onChange={handleChange} placeholder="Enter your mobile number" className="w-full p-2 border-l" required />
               </div>
-              <small className="text-gray-500">Recruiters will contact you on this number</small>
             </div>
 
             <div>
               <label className="font-semibold">Role</label>
-              <select className="w-full p-2 border rounded mt-1">
-                <option value="Job Seeker">Job Seeker</option>
-                <option value="Employer">Employer</option>
+              <select name="role" value={formData.role} onChange={handleChange} className="w-full p-2 border rounded mt-1" required>
+                <option value="">Select a role</option>
+                <option value="job_seeker">job_seeker</option>
+                <option value="employer">employer</option>
+                <option value="admin">admin</option>
               </select>
-              <small className="text-gray-500">Select if you are job seeker or employer</small>
-            </div>
-
-            <div className="flex items-center">
-              <input type="checkbox" id="updates" className="mr-2" />
-              <label htmlFor="updates" className="text-sm">Send me important updates & promotions via email.</label>
             </div>
 
             <div className="text-center">
-              <p className="text-sm text-gray-500">By clicking Register, you agree to the <a href="#" className="text-blue-600">Terms and Conditions</a> & <a href="#" className="text-blue-600">Privacy Policy</a> of Naukri.com</p>
+              <p className="text-sm text-gray-500">By clicking Register, you agree to the <a href="#" className="text-blue-600">Terms and Conditions</a> & <a href="#" className="text-blue-600">Privacy Policy</a></p>
               <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded mt-3">Register now</button>
             </div>
           </form>
-
-          {/* Google Login */}
-          <div className="text-center mt-6 flex justify-center">
-            <div>
-              <span className="block text-gray-500 mb-2">Or</span>
-              <button className="flex items-center justify-center gap-2 border px-4 py-2 rounded hover:border-black">
-                <img src={Google} alt="Google" className="w-6" />
-                Continue with Google
-              </button>
-            </div>
-          </div>
         </div>
       </div>
     </>

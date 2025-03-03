@@ -1,53 +1,79 @@
-import React from "react";
-import Amazon from "../assets/amazon.png";
-import { FaSearch, FaUser, FaHome, FaBriefcase, FaPlus, FaTachometerAlt, FaSignOutAlt, FaChevronRight } from "react-icons/fa";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
-import { Link } from "react-router-dom";
+import axios from "axios";
 
 const JobDetailsPage = () => {
+    const { jobId } = useParams();
+    const [job, setJob] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchJobDetails = async () => {
+            const token = localStorage.getItem("token"); // Get token from localStorage
+
+            try {
+                const response = await axios.get(`http://localhost:5000/api/jobs/${jobId}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`, // Add token to request headers
+                    },
+                });
+
+                setJob(response.data);
+            } catch (error) {
+                setError("Failed to load job details");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchJobDetails();
+    }, [jobId]);
+
+    if (loading) return <div>Loading...</div>;
+    if (error) return <div className="text-red-500">{error}</div>;
+
     return (
         <div className="w-full min-h-screen bg-gray-100">
-            {/* Header Section */}
             <Header />
-
-            {/* Main Content */}
             <div className="flex w-full h-[calc(100vh-80px)]">
-                {/* Sidebar */}
                 <Sidebar />
-
-                {/* Job Details Section */}
                 <div className="w-3/4 h-full flex flex-col items-center overflow-y-auto py-10 space-y-6 px-8">
                     <div className="bg-white w-11/12 p-8 border border-gray-300 rounded-lg shadow-lg">
-                        {/* Job Header */}
                         <div className="flex justify-between items-center mb-6">
                             <div className="flex items-center space-x-4">
-                                <img src={Amazon} alt="Company Logo" className="w-20 h-20 object-cover rounded-full border border-gray-300" />
+                                <img
+                                    src={job?.image ? `http://localhost:5000/uploads/${job.image}` : "/images/default-job.png"}
+                                    alt="Job Image"
+                                    className="w-[80px] h-[80px] object-cover rounded-[40px]"
+                                />
+
                                 <div>
-                                    <h2 className="text-2xl font-bold text-gray-800">Frontend Developer</h2>
-                                    <p className="text-gray-500">Google - California, USA</p>
+                                    <h2 className="text-2xl font-bold text-gray-800">{job?.job_title}</h2>
+                                    <p className="text-gray-500">{job?.company} - {job?.location}</p>
                                 </div>
                             </div>
                         </div>
-
-                        {/* Job Description */}
-                        <h3 className="text-xl font-semibold text-gray-700 mb-3">Job Description</h3>
-                        <p className="text-gray-600 leading-relaxed">
-                            We are looking for a talented Frontend Developer to join our team. You will be responsible for implementing visual elements that users see and interact with in a web application.
-                        </p>
-
-                        {/* Requirements */}
-                        <h3 className="text-xl font-semibold text-gray-700 mt-6 mb-3">Requirements</h3>
+                        <div className="flex items-center gap-4">
+                            <h2 className="text-[18px] font-semibold text-gray-700">Job Type: </h2>
+                            <p className="text-gray-600 leading-relaxed">{job?.job_type}</p>
+                        </div><br />
+                        <div className="flex items-center gap-4">
+                            <h2 className="text-[18px] font-semibold text-gray-700">Salary: </h2>
+                            <p className="text-gray-600 leading-relaxed">Rs. {job?.salary}</p>
+                        </div><br />
+                        <h3 className="text-[18px] font-semibold text-gray-700 mb-3">Job Description:</h3>
+                        <p className="text-gray-600 leading-relaxed">{job?.description}</p>
                         <ul className="list-disc ml-6 text-gray-600 space-y-2">
-                            <li>Experience with HTML, CSS, JavaScript</li>
-                            <li>Familiarity with React or Angular</li>
-                            <li>Good understanding of UI/UX principles</li>
-                            <li>Ability to work in a team environment</li>
+                            {job?.requirements?.map((req, index) => (
+                                <li key={index}>{req}</li>
+                            ))}
                         </ul>
-
-                        {/* Apply Button */}
                         <div className="mt-8 flex justify-center">
-                            <Link to="/apply-job" className="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg font-medium shadow-md hover:bg-blue-700 transition">
+                            <Link to={`/apply-job/${job.id}`} className="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg font-medium shadow-md hover:bg-blue-700 transition">
                                 Apply Now
                             </Link>
                         </div>
